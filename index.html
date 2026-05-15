@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>
+    IMPACTO 7D — Sistema de posicionamiento digital
+  </title>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- FIREBASE -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <!-- CHART -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- HTML2CANVAS -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <!-- JSPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</head>
+
+<body>
+
+  <div class="wrap">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+      <div class="header-left">
+
+        <div class="brand-wrap">
+
+          <img
+            src="logo-impacto7d.png"
+            alt="Logo Impacto 7D"
+            class="brand-logo"
+          >
+
+          <div>
+
+            <h2>
+              IMPACTO 7D
+            </h2>
+
+            <p>
+              Sistema de posicionamiento estratégico digital
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="header-actions">
+
+        <button
+          class="btn"
+          onclick="showPage('form')"
+        >
+          Nueva auditoría
+        </button>
+
+        <button
+          class="btn"
+          onclick="showPage('history')"
+        >
+
+          CRM / Clientes
+
+          <span
+            id="hist-count"
+            class="hist-count"
+          >
+            0
+          </span>
+
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- FORMULARIO -->
+
+    <div
+      class="page-form"
+      id="page-form"
+    >
+
+      <!-- DATOS -->
+
+      <div class="section">
+
+        <div class="section-title">
+          Datos del cliente
+        </div>
+
+        <div class="grid3">
+
+          <div class="field">
+
+            <label>
+              Nombre del negocio
+            </label>
+
+            <input
+              type="text"
+              id="f-nombre"
+              placeholder="Ej. Barbería Don Pedro"
+            >
+
+          </div>
+
+          <div class="field">
+
+            <label>
+              Categoría
+            </label>
+
+            <select id="f-cat">
+
+              <option value="">
+                Seleccionar...
+              </option>
+
+              <option>Barbería / peluquería</option>
+              <option>Restaurante / café</option>
+              <option>Odontología / salud</option>
+              <option>Tatuador / artista</option>
+              <option>Gimnasio / bienestar</option>
+              <option>Joyería / accesorios</option>
+              <option>Ropa / moda</option>
+              <option>Inmobiliaria</option>
+              <option>Médico estético</option>
+              <option>Marca personal</option>
+              <option>Otro</option>
+
+            </select>
+
+          </div>
+
+          <div class="field">
+
+            <label>
+              Instagram / red social
+            </label>
+
+            <input
+              type="text"
+              id="f-ig"
+              placeholder="@usuario"
+            >
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- PERFIL -->
+
+      <div class="section">
+
+        <div
+          class="section-title"
+          style="color:#7B5CFF"
+        >
+          Perfil & bio
+        </div>
+
+        <div id="criteria-perfil"></div>
+
+      </div>
+
+      <!-- CONTENIDO -->
+
+      <div class="section">
+
+        <div
+          class="section-title"
+          style="color:#22C58B"
+        >
+          Contenido visual
+        </div>
+
+        <div id="criteria-contenido"></div>
+
+      </div>
+
+      <!-- FRECUENCIA -->
+
+      <div class="section">
+
+        <div
+          class="section-title"
+          style="color:#FFB547"
+        >
+          Frecuencia & estrategia
+        </div>
+
+        <div id="criteria-frecuencia"></div>
+
+      </div>
+
+      <!-- PAUTA -->
+
+      <div class="section">
+
+        <div
+          class="section-title"
+          style="color:#FF5C5C"
+        >
+          Pauta & alcance
+        </div>
+
+        <div id="criteria-pauta"></div>
+
+      </div>
+
+      <!-- DIAGNÓSTICO -->
+
+      <div class="section">
+
+        <div class="section-title">
+          Diagnóstico en tiempo real
+        </div>
+
+        <div class="score-bar-wrap">
+
+          <div class="score-label">
+
+            Puntuación general:
+
+            <strong id="score-num">
+              0 / 14
+            </strong>
+
+          </div>
+
+          <div class="score-bar-bg">
+
+            <div
+              class="score-bar-fill"
+              id="score-bar"
+            ></div>
+
+          </div>
+
+        </div>
+
+        <!-- NIVEL -->
+
+        <div
+          id="level-box"
+          class="diag-box"
+        >
+
+          Nivel actual del negocio
+
+        </div>
+
+        <!-- DIAGNÓSTICO -->
+
+        <div
+          id="smart-report"
+          class="diag-box"
+        >
+
+          Aquí aparecerá el análisis inteligente.
+
+        </div>
+
+        <!-- GRÁFICA -->
+
+        <div class="chart-box">
+
+          <canvas
+            id="impactChart"
+            height="120"
+          ></canvas>
+
+        </div>
+
+      </div>
+
+      <!-- NOTAS -->
+
+      <div class="section">
+
+        <div class="section-title">
+          Notas & oportunidades
+        </div>
+
+        <div class="field">
+
+          <label>
+            ¿Qué puntos vas a mencionar en tu primer mensaje?
+          </label>
+
+          <textarea id="f-notas"></textarea>
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Observación de cierre
+          </label>
+
+          <textarea id="f-cierre"></textarea>
+
+        </div>
+
+      </div>
+
+      <!-- BOTONES -->
+
+      <div class="bottom-actions">
+
+        <button
+          class="btn"
+          onclick="resetForm()"
+        >
+          Limpiar
+        </button>
+
+        <button
+          class="btn"
+          onclick="downloadReport()"
+        >
+          Descargar PDF
+        </button>
+
+        <button
+          class="btn btn-primary"
+          onclick="saveAuditoria()"
+        >
+          Guardar auditoría
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- CRM -->
+
+    <div
+      class="page-history"
+      id="page-history"
+      style="display:none"
+    >
+
+      <div class="crm-header">
+
+        <div>
+
+          <h3>
+            CRM IMPACTO 7D
+          </h3>
+
+          <p>
+            Clientes y auditorías guardadas
+          </p>
+
+        </div>
+
+      </div>
+
+      <div id="history-list"></div>
+
+    </div>
+
+  </div>
+
+  <!-- REPORTE PDF -->
+
+  <div
+  id="download-report"
+  style="
+    position:fixed;
+    left:-10000px;
+    top:0;
+
+    width:1080px;
+    min-height:1350px;
+
+    overflow:visible;
+
+    background:#111111;
+    color:white;
+
+    padding:60px;
+    box-sizing:border-box;
+
+    font-family:Arial,sans-serif;
+  "
+>
+
+    <!-- HEADER -->
+
+    <div
+      style="
+        display:flex;
+        align-items:center;
+        gap:30px;
+        margin-bottom:50px;
+      "
+    >
+
+      <img
+        src="logo-impacto7d.png"
+        style="
+          width:110px;
+          height:110px;
+          object-fit:contain;
+        "
+      >
+
+      <div>
+
+        <h1
+          style="
+            font-size:52px;
+            margin:0;
+          "
+        >
+          AUDITORÍA DIGITAL
+        </h1>
+
+        <p
+          style="
+            font-size:24px;
+            color:#C9C9C9;
+            margin-top:10px;
+          "
+        >
+          Diagnóstico estratégico IMPACTO 7D
+        </p>
+
+      </div>
+
+    </div>
+
+    <!-- INFO -->
+
+    <div
+      style="
+        display:flex;
+        justify-content:space-between;
+        gap:20px;
+        margin-bottom:40px;
+      "
+    >
+
+      <div>
+
+        <div style="color:#999">
+          NEGOCIO
+        </div>
+
+        <strong
+          id="r-negocio"
+          style="font-size:30px"
+        >
+          -
+        </strong>
+
+      </div>
+
+      <div>
+
+        <div style="color:#999">
+          CATEGORÍA
+        </div>
+
+        <strong
+          id="r-cat"
+          style="font-size:30px"
+        >
+          -
+        </strong>
+
+      </div>
+
+      <div>
+
+        <div style="color:#999">
+          INSTAGRAM
+        </div>
+
+        <strong
+          id="r-ig"
+          style="font-size:30px"
+        >
+          -
+        </strong>
+
+      </div>
+
+    </div>
+
+    <!-- SCORE -->
+
+    <div
+  style="
+    background:#1C1C1C;
+    border-radius:25px;
+    padding:35px;
+    margin-bottom:30px;
+  "
+>
+
+      <h2
+        style="
+          margin-top:0;
+          font-size:38px;
+        "
+      >
+        MÉTRICAS GENERALES
+      </h2>
+
+      <div
+        style="
+          font-size:70px;
+          font-weight:bold;
+          color:#7B5CFF;
+          margin-top:20px;
+        "
+        id="r-score"
+      >
+        0/14
+      </div>
+
+      <div
+        id="r-level"
+        style="
+          font-size:28px;
+          margin-top:15px;
+        "
+      >
+        Nivel actual
+      </div>
+
+    </div>
+
+    <!-- DIAGNÓSTICO -->
+
+    <div
+      style="
+        background:#1C1C1C;
+        border-radius:25px;
+        padding:35px;
+        margin-bottom:30px;
+      "
+    >
+
+      <h3
+        style="
+          margin-top:0;
+          font-size:34px;
+        "
+      >
+        Diagnóstico inteligente
+      </h3>
+
+      <p
+        id="r-smart"
+        style="
+          font-size:24px;
+          line-height:1.7;
+          color:#D6D6D6;
+        "
+      ></p>
+
+    </div>
+
+    <!-- GRÁFICA PDF -->
+
+    <div
+      style="
+        background:#1C1C1C;
+        border-radius:25px;
+        padding:35px;
+        margin-bottom:30px;
+      "
+    >
+
+      <h3
+        style="
+          margin-top:0;
+          font-size:34px;
+          margin-bottom:20px;
+        "
+      >
+        Rendimiento por áreas
+      </h3>
+
+      <img
+        id="chart-image"
+        style="
+          width:100%;
+          border-radius:16px;
+        "
+      >
+
+    </div>
+<!-- PLAN DE MEJORA -->
+
+<div
+  style="
+    background:#1C1C1C;
+    border-radius:25px;
+    padding:35px;
+    margin-bottom:30px;
+  "
+>
+
+  <h3
+    style="
+      margin-top:0;
+      font-size:34px;
+      margin-bottom:20px;
+    "
+  >
+    Cómo IMPACTO 7D va a mejorar este negocio
+  </h3>
+
+  <div
+    id="r-improvement"
+    style="
+      font-size:24px;
+      line-height:1.8;
+      color:#D6D6D6;
+    "
+  ></div>
+
+</div>
+    <!-- SOLUCIÓN -->
+
+    <div
+      style="
+        background:#1C1C1C;
+        border-radius:25px;
+        padding:35px;
+      "
+    >
+
+      <h3
+        style="
+          margin-top:0;
+          font-size:34px;
+        "
+      >
+        ¿Cómo vamos a ayudarte?
+      </h3>
+
+      <ul
+        style="
+          font-size:24px;
+          line-height:2;
+          color:#D6D6D6;
+          padding-left:25px;
+        "
+      >
+
+        <li>
+          Estrategia digital personalizada
+        </li>
+
+        <li>
+          Optimización visual y branding
+        </li>
+
+        <li>
+          Producción de contenido premium
+        </li>
+
+        <li>
+          Captación estratégica de clientes
+        </li>
+
+        <li>
+          Escalamiento de autoridad digital
+        </li>
+
+      </ul>
+
+    </div>
+
+  </div>
+
+  <!-- TOAST -->
+
+  <div
+    class="toast"
+    id="toast"
+  ></div>
+
+  <!-- APP -->
+
+  <script src="app.js"></script>
+
+</body>
+
+</html>
